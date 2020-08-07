@@ -1,22 +1,27 @@
-set(EXTENSION_NAME "HelloExtensions")
-
 set(SOURCES 
-    "Include/Babylon/Extensions/HelloExtensions.h"
-    "Source/HelloExtensions.cpp")
+    "Include/Babylon/Extensions/NativeOnlyExtension.h"
+    "Source/NativeOnlyExtension.cpp")
 
-add_library(${EXTENSION_NAME} ${SOURCES})
-warnings_as_errors(${EXTENSION_NAME})
+    
+add_library(NativeOnlyExtension ${SOURCES})
+warnings_as_errors(NativeOnlyExtension)
 
-target_include_directories(${EXTENSION_NAME} PRIVATE "Include/Babylon/Extensions")
-target_include_directories(${EXTENSION_NAME} INTERFACE "Include")
+add_on_linked_as_dependency_cmake_file(NativeOnlyExtension "${CMAKE_CURRENT_SOURCE_DIR}/OnLinkedAsDependency.cmake")
+set(NATIVE_ONLY_EXTENSION_JS_SCRIPT_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/Scripts/NativeOnlyExtension.js"
+    CACHE STRING "NativeOnlyExtension JS script files")
 
-target_link_to_dependencies(${EXTENSION_NAME}
-    PUBLIC JsRuntime)
+target_include_directories(NativeOnlyExtension PRIVATE "Include/Babylon/Extensions")
+target_include_directories(NativeOnlyExtension INTERFACE "Include")
+
+target_link_to_dependencies(NativeOnlyExtension
+    PUBLIC napi
+    PUBLIC ScriptLoader)
 
 set(BABYLON_NATIVE_PLAYGROUND_EXTENSION_LIBRARIES
     ${BABYLON_NATIVE_PLAYGROUND_EXTENSION_LIBRARIES}
-    PRIVATE ${EXTENSION_NAME}
+    PRIVATE NativeOnlyExtension
     CACHE INTERNAL "")
 
-set_property(TARGET ${EXTENSION_NAME} PROPERTY FOLDER Extensions)
+set_property(TARGET NativeOnlyExtension PROPERTY FOLDER Extensions)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
